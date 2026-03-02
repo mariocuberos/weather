@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medellín Weather</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        /* Login Screen */
+        .login-box {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .login-box h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .login-box p {
+            opacity: 0.7;
+            margin-bottom: 2rem;
+        }
+        .login-box input {
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        .login-box input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+        .login-box button {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            background: #e94560;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .login-box button:hover {
+            background: #ff6b6b;
+            transform: translateY(-2px);
+        }
+        .error {
+            color: #ff6b6b;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        /* Weather Screen */
+        .weather-box {
+            display: none;
+        }
+        .weather-box.active {
+            display: block;
+        }
+        .login-box.hidden {
+            display: none;
+        }
+        .city-name {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+        }
+        .country {
+            opacity: 0.7;
+            margin-bottom: 2rem;
+        }
+        .weather-icon {
+            font-size: 6rem;
+            margin: 1rem 0;
+        }
+        .temperature {
+            font-size: 5rem;
+            font-weight: 200;
+        }
+        .description {
+            font-size: 1.5rem;
+            opacity: 0.9;
+            margin: 1rem 0;
+            text-transform: capitalize;
+        }
+        .details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        .detail-item {
+            text-align: center;
+        }
+        .detail-label {
+            font-size: 0.8rem;
+            opacity: 0.6;
+            margin-bottom: 0.3rem;
+        }
+        .detail-value {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        .logout {
+            margin-top: 2rem;
+            padding: 0.8rem 2rem;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .logout:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .loading {
+            opacity: 0.7;
+        }
+        .last-updated {
+            margin-top: 1.5rem;
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Screen -->
+        <div class="login-box" id="loginBox">
+            <h1>🌤️ Medellín Weather</h1>
+            <p>Please log in to continue</p>
+            <form id="loginForm">
+                <input type="text" id="username" placeholder="Username" autocomplete="off" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <button type="submit">Log In</button>
+            </form>
+            <p class="error" id="error">Invalid credentials</p>
+        </div>
+        
+        <!-- Weather Screen -->
+        <div class="weather-box" id="weatherBox">
+            <h1 class="city-name">Medellín</h1>
+            <p class="country">Colombia 🇨🇴</p>
+            <div class="weather-icon" id="weatherIcon">☀️</div>
+            <div class="temperature"><span id="temp">--</span>°C</div>
+            <p class="description" id="description">Loading...</p>
+            <div class="details">
+                <div class="detail-item">
+                    <div class="detail-label">Humidity</div>
+                    <div class="detail-value"><span id="humidity">--</span>%</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Wind</div>
+                    <div class="detail-value"><span id="wind">--</span> km/h</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Feels Like</div>
+                    <div class="detail-value"><span id="feelsLike">--</span>°C</div>
+                </div>
+            </div>
+            <p class="last-updated">Last updated: <span id="updated">--</span></p>
+            <button class="logout" id="logoutBtn">Log Out</button>
+        </div>
+    </div>
+
+    <script>
+        // Credentials
+        const VALID_USER = 'vip';
+        const VALID_PASS = 'vip123';
+        
+        // Medellín coordinates
+        const LAT = 6.2442;
+        const LON = -75.5812;
+        
+        // Weather codes to icons & descriptions
+        const weatherCodes = {
+            0: { icon: '☀️', desc: 'Clear sky' },
+            1: { icon: '🌤️', desc: 'Mainly clear' },
+            2: { icon: '⛅', desc: 'Partly cloudy' },
+            3: { icon: '☁️', desc: 'Overcast' },
+            45: { icon: '🌫️', desc: 'Foggy' },
+            48: { icon: '🌫️', desc: 'Depositing rime fog' },
+            51: { icon: '🌧️', desc: 'Light drizzle' },
+            53: { icon: '🌧️', desc: 'Moderate drizzle' },
+            55: { icon: '🌧️', desc: 'Dense drizzle' },
+            61: { icon: '🌧️', desc: 'Slight rain' },
+            63: { icon: '🌧️', desc: 'Moderate rain' },
+            65: { icon: '🌧️', desc: 'Heavy rain' },
+            80: { icon: '🌦️', desc: 'Slight showers' },
+            81: { icon: '🌦️', desc: 'Moderate showers' },
+            82: { icon: '⛈️', desc: 'Violent showers' },
+            95: { icon: '⛈️', desc: 'Thunderstorm' },
+            96: { icon: '⛈️', desc: 'Thunderstorm with hail' },
+            99: { icon: '⛈️', desc: 'Thunderstorm with heavy hail' }
+        };
+        
+        // DOM elements
+        const loginBox = document.getElementById('loginBox');
+        const weatherBox = document.getElementById('weatherBox');
+        const loginForm = document.getElementById('loginForm');
+        const errorMsg = document.getElementById('error');
+        const logoutBtn = document.getElementById('logoutBtn');
+        
+        // Check session
+        if (sessionStorage.getItem('loggedIn')) {
+            showWeather();
+        }
+        
+        // Login handler
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            
+            if (user === VALID_USER && pass === VALID_PASS) {
+                sessionStorage.setItem('loggedIn', 'true');
+                showWeather();
+            } else {
+                errorMsg.style.display = 'block';
+                setTimeout(() => errorMsg.style.display = 'none', 3000);
+            }
+        });
+        
+        // Logout handler
+        logoutBtn.addEventListener('click', () => {
+            sessionStorage.removeItem('loggedIn');
+            loginBox.classList.remove('hidden');
+            weatherBox.classList.remove('active');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        });
+        
+        function showWeather() {
+            loginBox.classList.add('hidden');
+            weatherBox.classList.add('active');
+            fetchWeather();
+        }
+        
+        async function fetchWeather() {
+            try {
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=America/Bogota`;
+                const res = await fetch(url);
+                const data = await res.json();
+                
+                const current = data.current;
+                const code = current.weather_code;
+                const weather = weatherCodes[code] || { icon: '🌡️', desc: 'Unknown' };
+                
+                document.getElementById('temp').textContent = Math.round(current.temperature_2m);
+                document.getElementById('humidity').textContent = current.relative_humidity_2m;
+                document.getElementById('wind').textContent = Math.round(current.wind_speed_10m);
+                document.getElementById('feelsLike').textContent = Math.round(current.apparent_temperature);
+                document.getElementById('weatherIcon').textContent = weather.icon;
+                document.getElementById('description').textContent = weather.desc;
+                document.getElementById('updated').textContent = new Date().toLocaleTimeString('en-CO', { hour: '2-digit', minute: '2-digit' });
+            } catch (err) {
+                document.getElementById('description').textContent = 'Error loading weather';
+            }
+        }
+        
+        // Refresh every 5 minutes
+        setInterval(fetchWeather, 300000);
+    </script>
+</body>
+</html>
