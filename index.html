@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medellín Weather</title>
+    <title>Clima - Mall La Frontera</title>
     <style>
         * {
             margin: 0;
@@ -18,12 +18,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 1rem;
         }
         .container {
             text-align: center;
-            padding: 2rem;
-            max-width: 500px;
-            width: 90%;
+            padding: 1.5rem;
+            max-width: 600px;
+            width: 100%;
         }
         
         /* Login Screen */
@@ -35,12 +36,18 @@
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
         }
         .login-box h1 {
-            font-size: 2rem;
+            font-size: 1.8rem;
             margin-bottom: 0.5rem;
         }
-        .login-box p {
+        .login-box .subtitle {
             opacity: 0.7;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+        }
+        .login-box .location {
+            opacity: 0.5;
             margin-bottom: 2rem;
+            font-size: 0.8rem;
         }
         .login-box input {
             width: 100%;
@@ -88,56 +95,106 @@
             display: none;
         }
         .city-name {
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             font-weight: 300;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
         }
-        .country {
+        .location-name {
+            font-size: 1rem;
             opacity: 0.7;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
         .weather-icon {
-            font-size: 6rem;
-            margin: 1rem 0;
+            font-size: 5rem;
+            margin: 0.5rem 0;
         }
         .temperature {
-            font-size: 5rem;
+            font-size: 4rem;
             font-weight: 200;
         }
         .description {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             opacity: 0.9;
-            margin: 1rem 0;
+            margin: 0.5rem 0;
             text-transform: capitalize;
         }
         .details {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 1rem;
-            margin-top: 2rem;
-            padding-top: 2rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
             border-top: 1px solid rgba(255,255,255,0.2);
         }
         .detail-item {
             text-align: center;
         }
         .detail-label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            opacity: 0.6;
+            margin-bottom: 0.2rem;
+        }
+        .detail-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        /* Forecast Section */
+        .forecast-section {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        .forecast-title {
+            font-size: 1rem;
+            opacity: 0.7;
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+        .forecast-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+        @media (max-width: 500px) {
+            .forecast-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        .forecast-item {
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 0.8rem 0.5rem;
+            text-align: center;
+        }
+        .forecast-hour {
+            font-size: 0.75rem;
             opacity: 0.6;
             margin-bottom: 0.3rem;
         }
-        .detail-value {
-            font-size: 1.2rem;
+        .forecast-icon {
+            font-size: 1.5rem;
+            margin: 0.2rem 0;
+        }
+        .forecast-temp {
+            font-size: 1rem;
             font-weight: 500;
         }
+        .forecast-rain {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-top: 0.2rem;
+        }
+        
         .logout {
-            margin-top: 2rem;
-            padding: 0.8rem 2rem;
+            margin-top: 1.5rem;
+            padding: 0.7rem 1.5rem;
             border: 1px solid rgba(255,255,255,0.3);
             border-radius: 10px;
             background: transparent;
             color: white;
             cursor: pointer;
+            font-size: 0.9rem;
             transition: background 0.2s;
         }
         .logout:hover {
@@ -147,8 +204,8 @@
             opacity: 0.7;
         }
         .last-updated {
-            margin-top: 1.5rem;
-            font-size: 0.8rem;
+            margin-top: 1rem;
+            font-size: 0.75rem;
             opacity: 0.5;
         }
     </style>
@@ -157,39 +214,49 @@
     <div class="container">
         <!-- Login Screen -->
         <div class="login-box" id="loginBox">
-            <h1>🌤️ Medellín Weather</h1>
-            <p>Please log in to continue</p>
+            <h1>🌤️ Clima Local</h1>
+            <p class="subtitle">Mall La Frontera</p>
+            <p class="location">Envigado, Colombia</p>
             <form id="loginForm">
-                <input type="text" id="username" placeholder="Username" autocomplete="off" required>
-                <input type="password" id="password" placeholder="Password" required>
-                <button type="submit">Log In</button>
+                <input type="text" id="username" placeholder="Usuario" autocomplete="off" required>
+                <input type="password" id="password" placeholder="Contraseña" required>
+                <button type="submit">Ingresar</button>
             </form>
-            <p class="error" id="error">Invalid credentials</p>
+            <p class="error" id="error">Credenciales inválidas</p>
         </div>
         
         <!-- Weather Screen -->
         <div class="weather-box" id="weatherBox">
-            <h1 class="city-name">Medellín</h1>
-            <p class="country">Colombia 🇨🇴</p>
+            <h1 class="city-name">Mall La Frontera</h1>
+            <p class="location-name">Envigado, Colombia 🇨🇴</p>
             <div class="weather-icon" id="weatherIcon">☀️</div>
             <div class="temperature"><span id="temp">--</span>°C</div>
-            <p class="description" id="description">Loading...</p>
+            <p class="description" id="description">Cargando...</p>
             <div class="details">
                 <div class="detail-item">
-                    <div class="detail-label">Humidity</div>
+                    <div class="detail-label">Humedad</div>
                     <div class="detail-value"><span id="humidity">--</span>%</div>
                 </div>
                 <div class="detail-item">
-                    <div class="detail-label">Wind</div>
+                    <div class="detail-label">Viento</div>
                     <div class="detail-value"><span id="wind">--</span> km/h</div>
                 </div>
                 <div class="detail-item">
-                    <div class="detail-label">Feels Like</div>
+                    <div class="detail-label">Sensación</div>
                     <div class="detail-value"><span id="feelsLike">--</span>°C</div>
                 </div>
             </div>
-            <p class="last-updated">Last updated: <span id="updated">--</span></p>
-            <button class="logout" id="logoutBtn">Log Out</button>
+            
+            <!-- 12 Hour Forecast -->
+            <div class="forecast-section">
+                <h3 class="forecast-title">📅 Próximas 12 horas</h3>
+                <div class="forecast-grid" id="forecastGrid">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+            
+            <p class="last-updated">Actualizado: <span id="updated">--</span></p>
+            <button class="logout" id="logoutBtn">Cerrar Sesión</button>
         </div>
     </div>
 
@@ -198,30 +265,30 @@
         const VALID_USER = 'vip';
         const VALID_PASS = 'vip123';
         
-        // Medellín coordinates
-        const LAT = 6.2442;
-        const LON = -75.5812;
+        // Mall La Frontera coordinates (Envigado)
+        const LAT = 6.1697;
+        const LON = -75.5859;
         
-        // Weather codes to icons & descriptions
+        // Weather codes to icons & descriptions (Spanish)
         const weatherCodes = {
-            0: { icon: '☀️', desc: 'Clear sky' },
-            1: { icon: '🌤️', desc: 'Mainly clear' },
-            2: { icon: '⛅', desc: 'Partly cloudy' },
-            3: { icon: '☁️', desc: 'Overcast' },
-            45: { icon: '🌫️', desc: 'Foggy' },
-            48: { icon: '🌫️', desc: 'Depositing rime fog' },
-            51: { icon: '🌧️', desc: 'Light drizzle' },
-            53: { icon: '🌧️', desc: 'Moderate drizzle' },
-            55: { icon: '🌧️', desc: 'Dense drizzle' },
-            61: { icon: '🌧️', desc: 'Slight rain' },
-            63: { icon: '🌧️', desc: 'Moderate rain' },
-            65: { icon: '🌧️', desc: 'Heavy rain' },
-            80: { icon: '🌦️', desc: 'Slight showers' },
-            81: { icon: '🌦️', desc: 'Moderate showers' },
-            82: { icon: '⛈️', desc: 'Violent showers' },
-            95: { icon: '⛈️', desc: 'Thunderstorm' },
-            96: { icon: '⛈️', desc: 'Thunderstorm with hail' },
-            99: { icon: '⛈️', desc: 'Thunderstorm with heavy hail' }
+            0: { icon: '☀️', desc: 'Despejado' },
+            1: { icon: '🌤️', desc: 'Mayormente despejado' },
+            2: { icon: '⛅', desc: 'Parcialmente nublado' },
+            3: { icon: '☁️', desc: 'Nublado' },
+            45: { icon: '🌫️', desc: 'Neblina' },
+            48: { icon: '🌫️', desc: 'Neblina con escarcha' },
+            51: { icon: '🌧️', desc: 'Llovizna ligera' },
+            53: { icon: '🌧️', desc: 'Llovizna moderada' },
+            55: { icon: '🌧️', desc: 'Llovizna densa' },
+            61: { icon: '🌧️', desc: 'Lluvia ligera' },
+            63: { icon: '🌧️', desc: 'Lluvia moderada' },
+            65: { icon: '🌧️', desc: 'Lluvia fuerte' },
+            80: { icon: '🌦️', desc: 'Chubascos ligeros' },
+            81: { icon: '🌦️', desc: 'Chubascos moderados' },
+            82: { icon: '⛈️', desc: 'Chubascos fuertes' },
+            95: { icon: '⛈️', desc: 'Tormenta eléctrica' },
+            96: { icon: '⛈️', desc: 'Tormenta con granizo' },
+            99: { icon: '⛈️', desc: 'Tormenta fuerte con granizo' }
         };
         
         // DOM elements
@@ -266,15 +333,20 @@
             fetchWeather();
         }
         
+        function getWeatherInfo(code) {
+            return weatherCodes[code] || { icon: '🌡️', desc: 'Desconocido' };
+        }
+        
         async function fetchWeather() {
             try {
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=America/Bogota`;
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&hourly=temperature_2m,weather_code,precipitation_probability&timezone=America/Bogota&forecast_hours=13`;
                 const res = await fetch(url);
                 const data = await res.json();
                 
+                // Current weather
                 const current = data.current;
                 const code = current.weather_code;
-                const weather = weatherCodes[code] || { icon: '🌡️', desc: 'Unknown' };
+                const weather = getWeatherInfo(code);
                 
                 document.getElementById('temp').textContent = Math.round(current.temperature_2m);
                 document.getElementById('humidity').textContent = current.relative_humidity_2m;
@@ -282,9 +354,38 @@
                 document.getElementById('feelsLike').textContent = Math.round(current.apparent_temperature);
                 document.getElementById('weatherIcon').textContent = weather.icon;
                 document.getElementById('description').textContent = weather.desc;
-                document.getElementById('updated').textContent = new Date().toLocaleTimeString('en-CO', { hour: '2-digit', minute: '2-digit' });
+                document.getElementById('updated').textContent = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+                
+                // 12 hour forecast
+                const forecastGrid = document.getElementById('forecastGrid');
+                forecastGrid.innerHTML = '';
+                
+                const hourly = data.hourly;
+                // Skip the first hour (current), show next 12
+                for (let i = 1; i <= 12; i++) {
+                    if (!hourly.time[i]) continue;
+                    
+                    const time = new Date(hourly.time[i]);
+                    const hour = time.getHours();
+                    const hourStr = hour.toString().padStart(2, '0') + ':00';
+                    const temp = Math.round(hourly.temperature_2m[i]);
+                    const weatherInfo = getWeatherInfo(hourly.weather_code[i]);
+                    const rainProb = hourly.precipitation_probability[i] || 0;
+                    
+                    const item = document.createElement('div');
+                    item.className = 'forecast-item';
+                    item.innerHTML = `
+                        <div class="forecast-hour">${hourStr}</div>
+                        <div class="forecast-icon">${weatherInfo.icon}</div>
+                        <div class="forecast-temp">${temp}°</div>
+                        ${rainProb > 0 ? `<div class="forecast-rain">💧 ${rainProb}%</div>` : ''}
+                    `;
+                    forecastGrid.appendChild(item);
+                }
+                
             } catch (err) {
-                document.getElementById('description').textContent = 'Error loading weather';
+                document.getElementById('description').textContent = 'Error al cargar';
+                console.error(err);
             }
         }
         
